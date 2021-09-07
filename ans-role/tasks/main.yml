@@ -1,0 +1,42 @@
+---
+
+  - name: Creating group deloitte
+    group:
+      name={{ groupname }}
+      state=present
+  - name: Creating user
+    user:
+      name={{ username }}
+      state=present
+  - name: Install the latest version of Apache
+    yum:
+      name={{ item }}
+      state=latest
+    with_items:
+      - git
+      - vim
+      - httpd
+    when: ansible_os_family == "RedHat"
+  - name: Template a file to /etc/file.conf
+    ansible.builtin.template:
+      src: httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify:
+      - Start service httpd, if not started
+  - name: Start service httpd, if not started
+    ansible.builtin.service:
+      name={{ webserver }}
+      state=started
+  - name: Run Shell Script and register the output
+    shell: "ls"
+    args:
+      chdir: "/home/centos/ansible/sanchita"
+    register: scriptOut
+    when: ansible_nodename == "ip-172-31-4-70.ap-south-1.compute.internal"
+  - name: Template a file to /etc/file.conf
+    ansible.builtin.template:
+      src: index.j2
+      dest: /var/www/html/index.html
+  - name: Print the vars
+    ansible.builtin.debug:
+      msg: Port {{ port }}

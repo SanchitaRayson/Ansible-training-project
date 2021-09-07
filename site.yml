@@ -1,0 +1,12 @@
+---
+- name: Install Apache and run on port 8080
+  hosts: all
+  vars:
+    groupname: deloitte
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter username:"
+      private: false
+   
+  roles:
+    - gantsign.java
